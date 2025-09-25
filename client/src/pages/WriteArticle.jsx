@@ -22,7 +22,7 @@ const WriteArticle = () => {
     try {
       setLoading(true)
       const prompt= `Write an article about ${input} in ${selectedLength.text}`
-      const {data}= await axios.post('http://localhost:3000/api/ai/generate-article',{prompt,
+      const {data}= await axios.post('https://quick-ai-server-nu-ten.vercel.app/api/ai/generate-article',{prompt,
         length:selectedLength.length},{
           headers:{Authorization:`Bearer ${await getToken()}`}
       })

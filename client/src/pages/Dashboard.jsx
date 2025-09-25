@@ -13,7 +13,7 @@ const Dashboard = () => {
   const { getToken } = useAuth()
   const getDashboardData=async()=>{
     try{
-      const{data}=await axios.get('http://localhost:3000/api/user/get-user-creations',{
+      const{data}=await axios.get('https://quick-ai-server-nu-ten.vercel.app/api/user/get-user-creations',{
         headers:{Authorization:`Bearer ${await getToken()}`}
       })
       if(data.success){

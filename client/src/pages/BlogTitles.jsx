@@ -1,7 +1,7 @@
 import { Hash, Sparkles } from 'lucide-react'
 import { useState } from 'react'
 import React from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'react-hot-toast'
 import Markdown from 'react-markdown'
 import {useAuth} from '@clerk/clerk-react'
 import axios from 'axios'

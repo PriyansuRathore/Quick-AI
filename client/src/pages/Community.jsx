@@ -15,7 +15,7 @@ const Community = () => {
   const fetchCreations=async()=>{
     // setCreations(dummyPublishedCreationData)
     try{
-      const {data}=await axios.get('http://localhost:3000/api/user/get-published-creations',{
+      const {data}=await axios.get('https://quick-ai-server-nu-ten.vercel.app/api/user/get-published-creations',{
         headers:{Authorization:`Bearer ${await getToken()}`}
       })
       if(data.success){
@@ -30,7 +30,7 @@ const Community = () => {
   }
   const imageLikeToggle=async (id)=>{
     try{
-      const {data}=await axios.post('http://localhost:3000/api/user/toggle-like-creation',{id},{
+      const {data}=await axios.post('https://quick-ai-server-nu-ten.vercel.app/api/user/toggle-like-creation',{id},{
         headers: {Authorization:`Bearer ${await getToken()}`}
       })
       if(data.success){

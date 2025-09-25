@@ -16,7 +16,7 @@ const RemoveBackground = () => {
           const formData=new FormData()
           formData.append('image',input)
   
-          const {data}= await axios.post('http://localhost:3000/api/ai/remove-image-background',formData,{headers:{Authorization:`Bearer ${await getToken()}`}})
+          const {data}= await axios.post('https://quick-ai-server-nu-ten.vercel.app/api/ai/remove-image-background',formData,{headers:{Authorization:`Bearer ${await getToken()}`}})
           if (data.success){
             setContent(data.content)
           }else{

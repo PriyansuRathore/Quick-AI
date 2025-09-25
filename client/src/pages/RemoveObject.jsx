@@ -21,7 +21,7 @@ const RemoveObject = () => {
           formData.append('image',input)
           formData.append('object',object)
   
-          const {data}= await axios.post('http://localhost:3000/api/ai/remove-image-object',formData,{headers:{Authorization:`Bearer ${await getToken()}`}})
+          const {data}= await axios.post('https://quick-ai-server-nu-ten.vercel.app/api/ai/remove-image-object',formData,{headers:{Authorization:`Bearer ${await getToken()}`}})
           if (data.success){
             setContent(data.content)
           }else{
