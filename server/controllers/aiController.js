@@ -5,7 +5,7 @@ import { v2 as cloudinary } from "cloudinary";
 import axios from "axios";
 import FormData from "form-data";
 import fs from 'fs';
-import pdf from 'pdf-parse/lib/pdf-parse.js'
+import pdfParse from 'pdf-parse/lib/pdf-parse.js'
 
 const AI = new OpenAI({
     apiKey: process.env.GEMINI_API_KEY,
@@ -229,7 +229,7 @@ export const resumeReview=async(req,res)=>{
             return res.json({success:false,message:"Resume file size exceeds allowed size (5MB)."})
         }
         const dataBuffer=fs.readFileSync(resume.path)
-        const pdfData= await pdf(dataBuffer)
+        const pdfData= await pdfParse(dataBuffer)
 
         const prompt=`Review the following resume and provide constructive feedback on its strengths , weaknesses, and areas for improvement. Resume Content:\n\n${pdfData.text}`
         const response = await AI.chat.completions.create({
@@ -252,5 +252,46 @@ export const resumeReview=async(req,res)=>{
         res.json({success:true, content})
     }catch (error){
         res.json({success:false, message:error.message})    
+    }
+}
+
+// PDF Chat
+export const pdfChat = async (req, res) => {
+    try {
+        const userId = 'user_test123';
+        const plan = 'premium';
+        const pdf = req.file;
+        const { question } = req.body;
+
+        if (plan !== 'premium') {
+            return res.json({ success: false, message: 'This feature is only available for premium subscriptions' });
+        }
+
+        if (pdf.size > 10 * 1024 * 1024) {
+            return res.json({ success: false, message: "PDF file size exceeds allowed size (10MB)." });
+        }
+
+        const dataBuffer = fs.readFileSync(pdf.path);
+        const pdfData = await pdfParse(dataBuffer);
+
+        const prompt = `Based on the following PDF content, answer this question: "${question}"\n\nPDF Content:\n\n${pdfData.text}`;
+        
+        const response = await AI.chat.completions.create({
+            model: "gemini-2.0-flash",
+            messages: [{
+                role: "user",
+                content: prompt,
+            }],
+            temperature: 0.7,
+            max_tokens: 1000,
+        });
+        
+        const content = response.choices[0].message.content;
+        
+        await sql`INSERT INTO creations (user_id, prompt, content) VALUES (${userId}, ${`PDF Chat: ${question}`}, ${content})`;
+        
+        res.json({ success: true, content });
+    } catch (error) {
+        res.json({ success: false, message: error.message });
     }
 }
