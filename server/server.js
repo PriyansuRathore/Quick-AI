@@ -11,7 +11,7 @@ const app= express();
 await connectCloudinary()
 
 app.use(cors({
-    origin: ['http://localhost:5173', 'https://quickai-coral.vercel.app'],
+    origin: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
