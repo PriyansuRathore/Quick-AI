@@ -1,6 +1,6 @@
 import React from 'react'
 import { NavLink } from 'react-router-dom'
-import { Eraser, FileText, Hash, House, Image, SquarePen, Users, Scissors, LogOut, MessageCircle} from 'lucide-react';
+import { Eraser, FileText, Hash, House, Image, SquarePen, Users, Scissors, LogOut} from 'lucide-react';
 import { Protect, useClerk, useUser } from '@clerk/clerk-react';
 const navItems=[
   {to:'/ai',label:'Dashboard',Icon:House},
@@ -10,7 +10,6 @@ const navItems=[
   {to:'/ai/remove-background',label:'Remove Background',Icon:Eraser},
   {to:'/ai/remove-object',label:'Remove Object',Icon:Scissors},
   {to:'/ai/review-resume',label:'Review Resume',Icon:FileText},
-  {to:'/ai/pdf-chat',label:'PDF Chat',Icon:MessageCircle},
   {to:'/ai/community',label:'Community',Icon:Users},
 ]  
 const Sidebar = ({sidebar,setSidebar}) => {

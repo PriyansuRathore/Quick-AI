@@ -10,7 +10,6 @@ import RemoveBackground from './pages/RemoveBackground'
 import RemoveObject from './pages/RemoveObject'
 import ReviewResume from './pages/ReviewResume'
 import Community from './pages/Community'
-import PdfChat from './pages/PdfChat'
 import { useAuth } from '@clerk/clerk-react'
 import { useEffect } from 'react'
 
@@ -27,7 +26,6 @@ const App = () => {
           <Route path='remove-background' element={<RemoveBackground/>}/>
           <Route path='remove-object' element={<RemoveObject/>}/>
           <Route path='review-resume' element={<ReviewResume/>}/>
-          <Route path='pdf-chat' element={<PdfChat/>}/>
           <Route path='community' element={<Community/>}/>
         </Route>
       </Routes>
