@@ -257,6 +257,11 @@ export const resumeReview=async(req,res)=>{
 
 // PDF Chat
 export const pdfChat = async (req, res) => {
+    // Add CORS headers explicitly
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    
     try {
         const userId = 'user_test123';
         const plan = 'premium';

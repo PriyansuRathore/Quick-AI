@@ -14,5 +14,9 @@ aiRouter.post('/pdf-chat',upload.single('pdf') , pdfChat)
 aiRouter.get('/test-pdf-chat', (req, res) => {
     res.json({ success: true, message: 'PDF Chat endpoint is working!' })
 })
+aiRouter.post('/test-pdf-post', (req, res) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.json({ success: true, message: 'POST request working!', body: req.body })
+})
 
 export default aiRouter;
