@@ -11,5 +11,8 @@ aiRouter.post('/remove-image-background', upload.single('image'), removeImageBac
 aiRouter.post('/remove-image-object',upload.single('image'), removeImageObject)
 aiRouter.post('/resume-review',upload.single('resume') , resumeReview)
 aiRouter.post('/pdf-chat',upload.single('pdf') , pdfChat)
+aiRouter.get('/test-pdf-chat', (req, res) => {
+    res.json({ success: true, message: 'PDF Chat endpoint is working!' })
+})
 
 export default aiRouter;
