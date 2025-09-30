@@ -254,3 +254,111 @@ export const resumeReview=async(req,res)=>{
         res.json({success:false, message:error.message})    
     }
 }
+
+// Chat Functions
+export const getConversations = async (req, res) => {
+    try {
+        const userId = 'user_test123';
+        const conversations = await sql`
+            SELECT c.*, 
+                   (SELECT content FROM messages WHERE conversation_id = c.id AND role = 'user' ORDER BY created_at DESC LIMIT 1) as last_message
+            FROM conversations c 
+            WHERE user_id = ${userId} 
+            ORDER BY updated_at DESC
+        `;
+        res.json({ success: true, conversations });
+    } catch (error) {
+        res.json({ success: false, message: error.message });
+    }
+}
+
+export const getMessages = async (req, res) => {
+    try {
+        const { conversationId } = req.params;
+        const messages = await sql`
+            SELECT * FROM messages 
+            WHERE conversation_id = ${conversationId} 
+            ORDER BY created_at ASC
+        `;
+        res.json({ success: true, messages });
+    } catch (error) {
+        res.json({ success: false, message: error.message });
+    }
+}
+
+export const sendMessage = async (req, res) => {
+    try {
+        const userId = 'user_test123';
+        const { conversationId, message } = req.body;
+        
+        // Save user message
+        await sql`
+            INSERT INTO messages (conversation_id, role, content) 
+            VALUES (${conversationId}, 'user', ${message})
+        `;
+        
+        // Get conversation context (last 10 messages)
+        const context = await sql`
+            SELECT role, content FROM messages 
+            WHERE conversation_id = ${conversationId} 
+            ORDER BY created_at DESC LIMIT 10
+        `;
+        
+        // Build conversation for AI
+        const messages = context.reverse().map(msg => ({
+            role: msg.role,
+            content: msg.content
+        }));
+        
+        // Get AI response
+        const response = await AI.chat.completions.create({
+            model: "gemini-2.0-flash",
+            messages: messages,
+            temperature: 0.7,
+            max_tokens: 1000,
+        });
+        
+        const aiResponse = response.choices[0].message.content;
+        
+        // Save AI response
+        const savedMessage = await sql`
+            INSERT INTO messages (conversation_id, role, content) 
+            VALUES (${conversationId}, 'assistant', ${aiResponse})
+            RETURNING *
+        `;
+        
+        // Also save to creations table for dashboard
+        await sql`
+            INSERT INTO creations (user_id, prompt, content) 
+            VALUES (${userId}, ${`Chat: ${message}`}, ${aiResponse})
+        `;
+        
+        // Update conversation timestamp
+        await sql`
+            UPDATE conversations 
+            SET updated_at = CURRENT_TIMESTAMP 
+            WHERE id = ${conversationId}
+        `;
+        
+        res.json({ success: true, message: savedMessage[0] });
+    } catch (error) {
+        res.json({ success: false, message: error.message });
+    }
+}
+
+export const createConversation = async (req, res) => {
+    try {
+        const userId = 'user_test123';
+        const { title = 'New Chat' } = req.body;
+        
+        const conversation = await sql`
+            INSERT INTO conversations (user_id, title) 
+            VALUES (${userId}, ${title})
+            RETURNING *
+        `;
+        
+        res.json({ success: true, conversation: conversation[0] });
+    } catch (error) {
+        res.json({ success: false, message: error.message });
+    }
+}
