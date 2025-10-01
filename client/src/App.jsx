@@ -11,6 +11,7 @@ import RemoveObject from './pages/RemoveObject'
 import ReviewResume from './pages/ReviewResume'
 import Community from './pages/Community'
 import AiChat from './pages/AiChat'
+import VideoSummarizer from './pages/VideoSummarizer'
 import { useAuth } from '@clerk/clerk-react'
 import { useEffect } from 'react'
 
@@ -28,6 +29,7 @@ const App = () => {
           <Route path='remove-object' element={<RemoveObject/>}/>
           <Route path='review-resume' element={<ReviewResume/>}/>
           <Route path='chat' element={<AiChat/>}/>
+          <Route path='text-summarizer' element={<VideoSummarizer/>}/>
           <Route path='community' element={<Community/>}/>
         </Route>
       </Routes>

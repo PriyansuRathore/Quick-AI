@@ -6,6 +6,7 @@ import axios from "axios";
 import FormData from "form-data";
 import fs from 'fs';
 import pdfParse from 'pdf-parse/lib/pdf-parse.js'
+import { YoutubeTranscript } from 'youtube-transcript';
 
 const AI = new OpenAI({
     apiKey: process.env.GEMINI_API_KEY,
@@ -361,4 +362,137 @@ export const createConversation = async (req, res) => {
     } catch (error) {
         res.json({ success: false, message: error.message });
     }
+}
+
+// Video Summarizer
+export const summarizeVideo = async (req, res) => {
+    try {
+        const userId = 'user_test123';
+        const plan = 'premium';
+        const { videoUrl, summaryType = 'detailed' } = req.body;
+
+        if (plan !== 'premium') {
+            return res.json({ success: false, message: 'This feature is only available for premium subscriptions' });
+        }
+
+        // Extract video ID from YouTube URL
+        const videoId = extractVideoId(videoUrl);
+        if (!videoId) {
+            return res.json({ success: false, message: 'Invalid YouTube URL. Please provide a valid YouTube video link.' });
+        }
+
+        // Get transcript
+        let transcript;
+        try {
+            console.log('Attempting to fetch transcript for video ID:', videoId);
+            transcript = await YoutubeTranscript.fetchTranscript(videoId);
+            console.log('Transcript fetched successfully, length:', transcript?.length);
+        } catch (error) {
+            console.error('YouTube transcript error:', error.message);
+            return res.json({ 
+                success: false, 
+                message: `Unable to fetch transcript: ${error.message}. Try the manual text option instead.` 
+            });
+        }
+        
+        if (!transcript || transcript.length === 0) {
+            return res.json({ 
+                success: false, 
+                message: 'Transcript is empty or unavailable. YouTube may have restricted access to this video\'s captions. Please use the "Manual Text" option instead.' 
+            });
+        }
+
+        // Combine transcript text
+        const fullText = transcript.map(item => item.text).join(' ');
+        
+        // Create summary prompt based on type
+        const summaryPrompts = {
+            brief: `Provide a brief 2-3 sentence summary of this video transcript:\n\n${fullText}`,
+            detailed: `Provide a detailed summary with key points from this video transcript:\n\n${fullText}`,
+            bullets: `Create a bullet-point summary of the main topics covered in this video:\n\n${fullText}`
+        };
+
+        const prompt = summaryPrompts[summaryType] || summaryPrompts.detailed;
+
+        // Get AI summary
+        const response = await AI.chat.completions.create({
+            model: "gemini-2.0-flash",
+            messages: [{
+                role: "user",
+                content: prompt,
+            }],
+            temperature: 0.7,
+            max_tokens: 1000,
+        });
+        
+        const summary = response.choices[0].message.content;
+        
+        // Save to database
+        await sql`
+            INSERT INTO creations (user_id, prompt, content) 
+            VALUES (${userId}, ${`Video Summary: ${videoUrl}`}, ${summary})
+        `;
+        
+        res.json({ success: true, summary, transcript: fullText });
+    } catch (error) {
+        console.error('Video summarizer error:', error);
+        res.json({ success: false, message: 'Failed to process video. Please check the URL and try again.' });
+    }
+}
+
+// Text Summarizer (fallback for videos without transcripts)
+export const summarizeText = async (req, res) => {
+    try {
+        const userId = 'user_test123';
+        const plan = 'premium';
+        const { text, summaryType = 'detailed' } = req.body;
+
+        if (plan !== 'premium') {
+            return res.json({ success: false, message: 'This feature is only available for premium subscriptions' });
+        }
+
+        if (!text || text.trim().length < 50) {
+            return res.json({ success: false, message: 'Please provide at least 50 characters of text to summarize.' });
+        }
+
+        // Create summary prompt based on type
+        const summaryPrompts = {
+            brief: `Provide a brief 2-3 sentence summary of this text:\n\n${text}`,
+            detailed: `Provide a detailed summary with key points from this text:\n\n${text}`,
+            bullets: `Create a bullet-point summary of the main topics covered in this text:\n\n${text}`
+        };
+
+        const prompt = summaryPrompts[summaryType] || summaryPrompts.detailed;
+
+        // Get AI summary
+        const response = await AI.chat.completions.create({
+            model: "gemini-2.0-flash",
+            messages: [{
+                role: "user",
+                content: prompt,
+            }],
+            temperature: 0.7,
+            max_tokens: 1000,
+        });
+        
+        const summary = response.choices[0].message.content;
+        
+        // Save to database
+        await sql`
+            INSERT INTO creations (user_id, prompt, content) 
+            VALUES (${userId}, 'Text Summary', ${summary})
+        `;
+        
+        res.json({ success: true, summary, transcript: text });
+    } catch (error) {
+        console.error('Text summarizer error:', error);
+        res.json({ success: false, message: 'Failed to process text. Please try again.' });
+    }
+}
+
+// Helper function to extract video ID from YouTube URL
+function extractVideoId(url) {
+    const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+    const match = url.match(regex);
+    return match ? match[1] : null;
 }

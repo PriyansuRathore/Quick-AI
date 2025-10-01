@@ -1,6 +1,6 @@
 import express from "express";
 import { auth } from "../middlewares/auth.js";
-import { generateArticle, generateBlogTitle, generateImage,removeImageBackground,removeImageObject,resumeReview,getConversations,getMessages,sendMessage,createConversation } from "../controllers/aiController.js";
+import { generateArticle, generateBlogTitle, generateImage,removeImageBackground,removeImageObject,resumeReview,getConversations,getMessages,sendMessage,createConversation,summarizeVideo,summarizeText } from "../controllers/aiController.js";
 import { upload } from "../configs/multer.js";
 
 const aiRouter=express.Router();
@@ -16,5 +16,7 @@ aiRouter.get('/conversations', getConversations)
 aiRouter.get('/messages/:conversationId', getMessages)
 aiRouter.post('/send-message', sendMessage)
 aiRouter.post('/create-conversation', createConversation)
+aiRouter.post('/summarize-video', summarizeVideo)
+aiRouter.post('/summarize-text', summarizeText)
 
 export default aiRouter;
