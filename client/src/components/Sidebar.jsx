@@ -24,9 +24,9 @@ const Sidebar = ({sidebar,setSidebar}) => {
         <h1 className='mt-1 text-center'>{user.fullName}</h1>
         <div className='px-6 mt-5 text-sm text-gray-600 font-medium'>
           {navItems.map(({to, label, Icon})=>(
-            <NavLink key={to} to={to} end={to==='/ai'} onClick={()=>setSidebar(false)} className={({isActive})=>`px-3.5 py-2.5 flex items-center gap-3 rounded  ${isActive ? 'bg-gradient-to-r from-[#3C81F6] to-[#9234EA] text-white' : ''}`}>
+            <NavLink key={to} to={to} end={to==='/ai'} onClick={()=>setSidebar(false)} className={({isActive})=>`px-3.5 py-2.5 flex items-center gap-3 rounded-lg mb-1 transition-all duration-200 ${isActive ? 'bg-gradient-to-r from-[#3C81F6] to-[#9234EA] text-white shadow-lg transform scale-[1.02]' : 'hover:bg-gray-50 hover:transform hover:scale-[1.01]'}`}>
               {({isActive})=>(<>
-                <Icon className={`w-6 h-6 ${isActive ? 'text-white' : ''}`}/>
+                <Icon className={`w-5 h-5 transition-transform duration-200 ${isActive ? 'text-white' : 'group-hover:scale-110'}`}/>
                 {label}
               </>
             )}
@@ -45,7 +45,7 @@ const Sidebar = ({sidebar,setSidebar}) => {
             </p>
           </div>
         </div>
-        <LogOut onClick={signOut} className='w-4.5 text-gray-400 hover:text-gray-700  transition cursor-pointer'/>
+        <LogOut onClick={signOut} className='w-5 h-5 text-gray-400 hover:text-red-500 hover:scale-110 transition-all duration-200 cursor-pointer'/>
       </div>
     </div>
   )
