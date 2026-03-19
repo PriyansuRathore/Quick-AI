@@ -34,7 +34,7 @@ export const generateArticle=async(req,res)=>{
         }
         
     const response = await AI.chat.completions.create({
-        model: "gemini-2.0-flash",
+        model: "gemini-1.5-flash",
         messages: [
             {
                 role: "user",
@@ -79,7 +79,7 @@ export const generateBlogTitle=async(req,res)=>{
         }
         
     const response = await AI.chat.completions.create({
-        model: "gemini-2.0-flash",
+        model: "gemini-1.5-flash",
         messages: [
             {
                 role: "user",
@@ -234,7 +234,7 @@ export const resumeReview=async(req,res)=>{
 
         const prompt=`Review the following resume and provide constructive feedback on its strengths , weaknesses, and areas for improvement. Resume Content:\n\n${pdfData.text}`
         const response = await AI.chat.completions.create({
-            model: "gemini-2.0-flash",
+            model: "gemini-1.5-flash",
             messages: [
                 {
                     role: "user",
@@ -313,7 +313,7 @@ export const sendMessage = async (req, res) => {
         
         // Get AI response
         const response = await AI.chat.completions.create({
-            model: "gemini-2.0-flash",
+            model: "gemini-1.5-flash",
             messages: messages,
             temperature: 0.7,
             max_tokens: 1000,
@@ -416,7 +416,7 @@ export const summarizeVideo = async (req, res) => {
 
         // Get AI summary
         const response = await AI.chat.completions.create({
-            model: "gemini-2.0-flash",
+            model: "gemini-1.5-flash",
             messages: [{
                 role: "user",
                 content: prompt,
@@ -466,7 +466,7 @@ export const summarizeText = async (req, res) => {
 
         // Get AI summary
         const response = await AI.chat.completions.create({
-            model: "gemini-2.0-flash",
+            model: "gemini-1.5-flash",
             messages: [{
                 role: "user",
                 content: prompt,

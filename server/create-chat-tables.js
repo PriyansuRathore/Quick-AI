@@ -1,22 +1,8 @@
 import 'dotenv/config';
 import sql from './configs/db.js';
 
-async function createTables() {
+async function createChatTables() {
     try {
-        // Create creations table
-        await sql`
-            CREATE TABLE IF NOT EXISTS creations (
-                id SERIAL PRIMARY KEY,
-                user_id VARCHAR(255) NOT NULL,
-                prompt TEXT NOT NULL,
-                content TEXT NOT NULL,
-                publish BOOLEAN DEFAULT FALSE,
-                likes TEXT[] DEFAULT '{}',
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        `;
-        console.log('Creations table created successfully');
-
         // Create conversations table
         await sql`
             CREATE TABLE IF NOT EXISTS conversations (
@@ -41,21 +27,18 @@ async function createTables() {
         `;
         console.log('Messages table created successfully');
 
-        // Create indexes for better performance
+        // Create index for better performance
         await sql`
             CREATE INDEX IF NOT EXISTS idx_messages_conversation_id ON messages(conversation_id)
         `;
-        await sql`
-            CREATE INDEX IF NOT EXISTS idx_conversations_user_id ON conversations(user_id)
-        `;
         console.log('Database indexes created successfully');
 
-        console.log('All tables created successfully!');
+        console.log('All chat tables created successfully!');
         process.exit(0);
     } catch (error) {
-        console.error('Error creating tables:', error);
+        console.error('Error creating chat tables:', error);
         process.exit(1);
     }
 }
 
-createTables();
+createChatTables();
